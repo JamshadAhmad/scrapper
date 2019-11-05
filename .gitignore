@@ -1,6 +1,9 @@
+!.gitkeep
 .idea
 .idea/*
 vendor
 vendor/*
+!input
 input/*
+!output
 output/*
