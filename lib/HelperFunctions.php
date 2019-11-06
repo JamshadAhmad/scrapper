@@ -36,5 +36,3 @@ function convertNewlineIntoLineBreak($input)
 {
     return str_replace("\n", '<br>', $input);
 }
-
-?>
