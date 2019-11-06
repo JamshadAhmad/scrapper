@@ -49,7 +49,7 @@ $mpdfConfig = array(
     //parsing pdf into text
     $parser = new Parser();
 
-    $pdf = $parser->parseFile('input/' . $the_big_array[1][0] . '.pdf');
+    $pdf = $parser->parseFile('input/' . $the_big_array[10][0] . '.pdf');
 
     $text = $pdf->getText();
 
@@ -77,12 +77,12 @@ $mpdfConfig = array(
                     <div class="infoLeftSection">
                         <div class="mainDetails">
                             <div class="Objective">
-                                <p style="font-weight: bold">Objectives:</p>
-                                <p style="font-family: Arial">' . $summary . '</p>
+                                <p style="font-weight: bold">OBJECTIVES:</p>
+                                <p>' . $summary . '</p>
                             </div>
                             <div class="Experience">
-                                <p id="PE" style="font-weight: bold;">Experience:</p>
-                                <p>' . $experience . '</p>
+                                <p id="PE" style="font-weight: bold;">EXPERIENCE:</p>
+                                <p id ="xp">' . $experience . '</p>
                             </div>
                         </div>
                     </div>
@@ -92,15 +92,15 @@ $mpdfConfig = array(
                         <div class="extraDetails">
                             <div class="email">
                                 <p style="font-weight: bold">Email:</p>
-                                <p>' . $the_big_array[1][2] . '</p>
+                                <p>' . $the_big_array[10][2] . '</p>
                             </div>
                             <div class="phone">
                                 <p style="font-weight: bold">Phone:</p>
-                                <p>' . $the_big_array[1][3] . '</p>
+                                <p>' . $the_big_array[10][3] . '</p>
                             </div>
                             <div class="linkL">
                                 <p style="font-weight: bold">Link:</p>
-                                ' . $the_big_array[1][1] . '
+                                ' . $the_big_array[10][1] . '
                             </div>
                         </div>
                     </div>
