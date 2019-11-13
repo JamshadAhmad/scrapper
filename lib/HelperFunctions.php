@@ -42,21 +42,38 @@ function convertNewlineIntoLineBreak($input)
  * @param $text
  * @return mixed
  */
-function convertPropertext($text){
+function convertPropertext($text)
+{
     $sum = getStringBetween($text, 'Summary', 'Experience');
-    $ch = explode("\n",$sum);
+    $ch = explode("\n", $sum);
 
     $string = '';
-    for ($i=0;$i<sizeof($ch);$i++){
+    $len = count($ch);
+    for ($i = 0; $i < $len; $i++) {
 //        $ch[$i].="\n";
-        if(strlen($ch[$i]) < 68) {
+        if (strlen($ch[$i]) < 68) {
 //            $ch[$i].="\n";
             $string .= $ch[$i] . "\n";
-        }
-        else{
+        } else {
 //            $ch[$i] = str_replace("\n", "-", $ch[$i]);
             $string .= $ch[$i];
         }
     }
     return str_replace("\n", "<br>", $string);
 }
+
+/**
+ * @param string $styleString
+ * @return string
+ */
+function getFontSize($styleString)
+{
+    $styles = explode(';', $styleString);
+    foreach ($styles as $style) {
+        $substyle = explode(':', $style);
+        if ($substyle[0] === 'font-size') {
+            return $substyle[1];
+        }
+    }
+}
+

@@ -10,6 +10,10 @@ $location = __DIR__ .'/output/';
 include 'vendor/autoload.php';
 include 'lib/HelperFunctions.php';
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 
 $the_big_array = [];
 
@@ -28,42 +32,22 @@ $stylesheet2 = file_get_contents('lib/main.css');
 
 //for($i = 1; $i<sizeof($the_big_array);$i++) {
 
-$mpdfConfig = array(
-    'mode' => 'utf-8',
-    'format' => 'A4',    // format - A4, for example, default ''
-    'default_font_size' => 0,     // font size - default 0
-    'default_font' => 'serif',    // default font family
-    'margin_left' => 0,    	// 15 margin_left
-    'margin_right' => 0,    	// 15 margin right
-    'margin_top' => 0,
-    'margin_bottom' => 0,
-    'margin_header' => 0,     // 9 margin header
-    'margin_footer' => 0,     // 9 margin footer
-    'orientation' => 'P',  	// L - landscape, P - portrait
-);
 
-    //parsing html to pdf
-    $mpdf = new Mpdf($mpdfConfig);
+shell_exec('lib/pdftohtml ' . 'input/' . $the_big_array[10][0] . '.pdf' . ' tmp'); //@todo now use generated html files
 
-    //parsing pdf into text
-    $parser = new Parser();
-
-    $pdf = $parser->parseFile('input/' . $the_big_array[10][0] . '.pdf');
-
-    $text = $pdf->getText();
+$text = $pdf->getText();
 
 
-    $pieces = explode("\n", $text);
-    $candidateName = trim($pieces[0]);
+$pieces = explode("\n", $text);
+$candidateName = trim($pieces[0]);
 
-
-    $experience = getStringBetween($text, "Experience\n", "Education\n");
+$experience = getStringBetween($text, "Experience\n", "Education\n");
 //    echo $experience;die;
-    $education = convertNewlineIntoLineBreak(getStringBetween($text, 'Education', $candidateName));
+$education = convertNewlineIntoLineBreak(getStringBetween($text, 'Education', $candidateName));
 
-    $html = '';
+$html = '';
 
-    $html .= '
+$html .= '
     <header>
         <div class="cvName container-fluid text-center">
             <div class="mainHeading">
@@ -121,10 +105,27 @@ $mpdfConfig = array(
 //    $html .= '<p>' . $education . '</p>';
 
 
-    $mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
-    $mpdf->WriteHTML($stylesheet2, HTMLParserMode::HEADER_CSS);
-    $mpdf->WriteHTML($html, HTMLParserMode::HTML_BODY);
-    $mpdf->Output();
+$mpdfConfig = array(
+    'mode' => 'utf-8',
+    'format' => 'A4',    // format - A4, for example, default ''
+    'default_font_size' => 0,     // font size - default 0
+    'default_font' => 'serif',    // default font family
+    'margin_left' => 0,    	// 15 margin_left
+    'margin_right' => 0,    	// 15 margin right
+    'margin_top' => 0,
+    'margin_bottom' => 0,
+    'margin_header' => 0,     // 9 margin header
+    'margin_footer' => 0,     // 9 margin footer
+    'orientation' => 'P',  	// L - landscape, P - portrait
+);
+
+//parsing html to pdf
+$mpdf = new Mpdf($mpdfConfig);
+
+$mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
+$mpdf->WriteHTML($stylesheet2, HTMLParserMode::HEADER_CSS);
+$mpdf->WriteHTML($html, HTMLParserMode::HTML_BODY);
+$mpdf->Output();
 //print $html;
 //}
 
