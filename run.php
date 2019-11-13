@@ -19,7 +19,6 @@ if (($h = fopen("lib/Cosmo Shahzeen.csv", "r")) !== FALSE) {
     while (($data = fgetcsv($h, 1000, ",")) !== FALSE) {
         $the_big_array[] = $data;
     }
-
     fclose($h);
 }
 
@@ -53,24 +52,26 @@ $mpdfConfig = array(
 
     $text = $pdf->getText();
 
+
     $pieces = explode("\n", $text);
     $candidateName = trim($pieces[0]);
 
-    $summary = getStringBetween($text, 'Summary', 'Experience');
 
-    $experience = convertNewlineIntoLineBreak(getStringBetween($text, 'Experience', 'Education'));
-
-    $education = convertNewlineIntoLineBreak(getStringBetween($text, 'Education', $candidateName));;
+    $experience = getStringBetween($text, "Experience\n", "Education\n");
+//    echo $experience;die;
+    $education = convertNewlineIntoLineBreak(getStringBetween($text, 'Education', $candidateName));
 
     $html = '';
 
     $html .= '
-    <body>           
+    <header>
         <div class="cvName container-fluid text-center">
             <div class="mainHeading">
-                <h1 style="font-weight: bold;">' . $candidateName . '</h1>
+                <h1 id="yay">' . $candidateName . '</h1>
             </div>
         </div>
+    </header>
+    <body>
         <div class="container-fluid">
             <div class="row">
                 <div class="col-xs-8 ">
@@ -78,11 +79,11 @@ $mpdfConfig = array(
                         <div class="mainDetails">
                             <div class="Objective">
                                 <p style="font-weight: bold">OBJECTIVES:</p>
-                                <p>' . $summary . '</p>
+                                <p>' .convertPropertext($text) . '</p>
                             </div>
                             <div class="Experience">
                                 <p id="PE" style="font-weight: bold;">EXPERIENCE:</p>
-                                <p id ="xp">' . $experience . '</p>
+                                
                             </div>
                         </div>
                     </div>
@@ -124,6 +125,7 @@ $mpdfConfig = array(
     $mpdf->WriteHTML($stylesheet2, HTMLParserMode::HEADER_CSS);
     $mpdf->WriteHTML($html, HTMLParserMode::HTML_BODY);
     $mpdf->Output();
+//print $html;
 //}
 
 
