@@ -1,10 +1,8 @@
 <?php
 use Mpdf\HTMLParserMode;
 use Mpdf\Mpdf;
-use Mpdf\Output\Destination;
-use Smalot\PdfParser\Parser;
+use DiDom\Document;
 
-require_once __DIR__ . '/vendor/autoload.php';
 $location = __DIR__ .'/output/';
 
 include 'vendor/autoload.php';
@@ -14,11 +12,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-
 $the_big_array = [];
 
 // Open the file for reading
-
 if (($h = fopen("lib/Cosmo Shahzeen.csv", "r")) !== FALSE) {
     while (($data = fgetcsv($h, 1000, ",")) !== FALSE) {
         $the_big_array[] = $data;
@@ -26,107 +22,112 @@ if (($h = fopen("lib/Cosmo Shahzeen.csv", "r")) !== FALSE) {
     fclose($h);
 }
 
+shell_exec('lib/pdftohtml input/10.pdf tmp');
+shell_exec('chmod 777 -R tmp');
+$finalHtml='';
+$i = 1;
+do{
+    $page = 'tmp/page'.$i.'.html';
+    $finalHtml .= file_get_contents($page);
+    $i ++;
+} while (file_exists('tmp/page'.$i.'.html'));
+
+$document = new Document($finalHtml);
+$spans = $document->find('span');
+$i = -1;
+
+foreach($spans as $span) {
+    $heading = whichHeading(getFontSize($span -> style));
+    if($heading == 'hugeheading' || $heading == 'bigheading' || $heading == 'subheading') {
+        $i ++;
+        $sections[$i][$heading] = $span -> text();
+    }
+    else {
+        $sections[$i][$heading][] = $span -> text();
+    }
+}
+$html = '';
+$html .= '
+        
+<body>
+    <div class="cvName container-fluid text-center">
+        <div class="mainHeading">
+            <h1 id="yay">' . $sections[0]['hugeheading'] . '</h1>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-8 ">
+                <div class="infoLeftSection">
+                    <div class="mainDetails">
+                        <div class="Objective">
+                            <p style="font-weight: bold">OBJECTIVES:</p>
+                            <p></p>
+                        </div>
+                        <div class="Experience">
+                            <p id="PE" style="font-weight: bold;">EXPERIENCE:</p>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3 ">
+                <div class="infoRightSection">
+                    <div class="extraDetails">
+                        <div class="email">
+                            <p style="font-weight: bold">Email:</p>
+                            <p>' . $the_big_array[10][2] . '</p>
+                        </div>
+                        <div class="phone">
+                            <p style="font-weight: bold">Phone:</p>
+                            <p>' . $the_big_array[10][3] . '</p>
+                        </div>
+                        <div class="linkL">
+                            <p style="font-weight: bold">Link:</p>
+                            ' . $the_big_array[10][1] . '
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>';
+
 $stylesheet = file_get_contents('lib/bootstrap.min.css');
 $stylesheet2 = file_get_contents('lib/main.css');
-
-
-//for($i = 1; $i<sizeof($the_big_array);$i++) {
-
-
-shell_exec('lib/pdftohtml ' . 'input/' . $the_big_array[10][0] . '.pdf' . ' tmp'); //@todo now use generated html files
-
-$text = $pdf->getText();
-
-
-$pieces = explode("\n", $text);
-$candidateName = trim($pieces[0]);
-
-$experience = getStringBetween($text, "Experience\n", "Education\n");
-//    echo $experience;die;
-$education = convertNewlineIntoLineBreak(getStringBetween($text, 'Education', $candidateName));
-
-$html = '';
-
-$html .= '
-    <header>
-        <div class="cvName container-fluid text-center">
-            <div class="mainHeading">
-                <h1 id="yay">' . $candidateName . '</h1>
-            </div>
-        </div>
-    </header>
-    <body>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-xs-8 ">
-                    <div class="infoLeftSection">
-                        <div class="mainDetails">
-                            <div class="Objective">
-                                <p style="font-weight: bold">OBJECTIVES:</p>
-                                <p>' .convertPropertext($text) . '</p>
-                            </div>
-                            <div class="Experience">
-                                <p id="PE" style="font-weight: bold;">EXPERIENCE:</p>
-                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-3 ">
-                    <div class="infoRightSection">
-                        <div class="extraDetails">
-                            <div class="email">
-                                <p style="font-weight: bold">Email:</p>
-                                <p>' . $the_big_array[10][2] . '</p>
-                            </div>
-                            <div class="phone">
-                                <p style="font-weight: bold">Phone:</p>
-                                <p>' . $the_big_array[10][3] . '</p>
-                            </div>
-                            <div class="linkL">
-                                <p style="font-weight: bold">Link:</p>
-                                ' . $the_big_array[10][1] . '
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>';
-
-//    $html .= '<br/> <br/> <br/> <br/>';
-//    $html .= '<h3>SUMMARY</h3>';
-//    $html .= '<p>' . $summary . '</p>';
-//    $html .= '<br/> <br/> <br/> <br/>';
-//    $html .= '<h3>EXPERIENCE</h3>';
-//    $html .= '<p>' . $experience . '</p>';
-//    $html .= '<br/> <br/> <br/> <br/>';
-//    $html .= '<h3>EDUCATION</h3>';
-//    $html .= '<p>' . $education . '</p>';
-
-
 $mpdfConfig = array(
     'mode' => 'utf-8',
-    'format' => 'A4',    // format - A4, for example, default ''
-    'default_font_size' => 0,     // font size - default 0
-    'default_font' => 'serif',    // default font family
-    'margin_left' => 0,    	// 15 margin_left
-    'margin_right' => 0,    	// 15 margin right
+    'format' => 'A4',
+    'default_font_size' => 0,
+    'default_font' => 'serif',
+    'margin_left' => 0,
+    'margin_right' => 0,
     'margin_top' => 0,
     'margin_bottom' => 0,
-    'margin_header' => 0,     // 9 margin header
-    'margin_footer' => 0,     // 9 margin footer
-    'orientation' => 'P',  	// L - landscape, P - portrait
+    'margin_header' => 0,
+    'margin_footer' => 0,
+    'orientation' => 'P',
 );
 
+
 //parsing html to pdf
-$mpdf = new Mpdf($mpdfConfig);
-
-$mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
-$mpdf->WriteHTML($stylesheet2, HTMLParserMode::HEADER_CSS);
-$mpdf->WriteHTML($html, HTMLParserMode::HTML_BODY);
-$mpdf->Output();
-//print $html;
-//}
-
-
+try {
+    $mpdf = new Mpdf($mpdfConfig);
+} catch (\Mpdf\MpdfException $e) {
+}
+try {
+    $mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
+} catch (\Mpdf\MpdfException $e) {
+}
+try {
+    $mpdf->WriteHTML($stylesheet2, HTMLParserMode::HEADER_CSS);
+} catch (\Mpdf\MpdfException $e) {
+}
+try {
+    $mpdf->WriteHTML($html, HTMLParserMode::HTML_BODY);
+} catch (\Mpdf\MpdfException $e) {
+}
+try {
+    $mpdf->Output();
+} catch (\Mpdf\MpdfException $e) {
+}

@@ -77,3 +77,14 @@ function getFontSize($styleString)
     }
 }
 
+/***
+ * @param $fontsize
+ * @return string
+ */
+function whichHeading($fontsize) {
+    if ((int)$fontsize >= 20 ) return 'hugeheading';
+    elseif((int)$fontsize >= 15 ) return 'bigheading';
+    elseif((int)$fontsize >= 13 ) return 'subheading';
+    else return 'text';
+}
+
