@@ -115,8 +115,6 @@ $html .= '
         <div class="cvName container-fluid text-center">
             <div class="mainHeading">
                 <h1 id="yay">' . $sections[0]['hugeheading'] . ' </h1>
-                <h4 id="yay">' . $sections[1]['subheading'] . ' </h4>
-                <h4 id="yay">' . $sections[2]['subheading'] . ' </h4>
             </div>
         </div>
         <div class="container-fluid">
@@ -177,25 +175,115 @@ $mpdfConfig = array(
     'orientation' => 'P',
 );
 
-
-//parsing html to pdf
-try {
-    $mpdf = new Mpdf($mpdfConfig);
-} catch (\Mpdf\MpdfException $e) {
-}
-try {
-    $mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
-} catch (\Mpdf\MpdfException $e) {
-}
-try {
-    $mpdf->WriteHTML($stylesheet2, HTMLParserMode::HEADER_CSS);
-} catch (\Mpdf\MpdfException $e) {
-}
-try {
-    $mpdf->WriteHTML($html, HTMLParserMode::HTML_BODY);
-} catch (\Mpdf\MpdfException $e) {
-}
-try {
-    $mpdf->Output();
-} catch (\Mpdf\MpdfException $e) {
-}
+$mpdf = new Mpdf($mpdfConfig);
+$mpdf->SetDisplayMode('fullpage');
+$mpdf->AddPage();
+$mpdf->WriteHTML('<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width"/>
+        <link type="text/css" rel="stylesheet" href="lib/main.css">
+        <link type="text/css" rel="stylesheet" href="lib/bootstrap.min.css">
+    </head>        
+    <body>
+        <div class="cvName container-fluid text-center">
+            <div class="mainHeading">
+                <h1 id="yay">' . $sections[0]['hugeheading'] . ' </h1>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">   
+                <div class="col-xs-8" style="width: 69.99%;!important;">
+                    <div class="infoLeftSection">
+                        <div class="mainDetails" >
+                            <div class="Objective" >
+                                <p style="font-weight: bold;font-style: italic;font-size: 18px;">OBJECTIVES:</p>
+                                <p style="font-size: 14px;">' . $final_summary . '</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3 " >
+                    <div class="infoRightSection">
+                        <div class="extraDetails">
+                            <div class="email">
+                                <p style="font-weight: bold">Email:</p>
+                                <p>' . $the_big_array[10][2] . '</p>
+                            </div>
+                            <div class="phone">
+                                <p style="font-weight: bold">Phone:</p>
+                                <p>' . $the_big_array[10][3] . '</p>
+                            </div>
+                            <div class="linkL">
+                                <p style="font-weight: bold">Link:</p>
+                                ' . $the_big_array[10][1] . '
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>');
+$mpdf->AddPage();
+$mpdf->WriteHTML('
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width"/>
+        <link type="text/css" rel="stylesheet" href="lib/main.css">
+        <link type="text/css" rel="stylesheet" href="lib/bootstrap.min.css">
+    </head>        
+    <body>
+        <div class="cvName container-fluid text-center">
+            <div class="mainHeading">
+                <h1 id="yay">PAGE1</h1>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">   
+                <div class="col-xs-8" style="width: 65%;!important;">
+                    <div class="infoLeftSection">
+                        <div class="mainDetails" >
+                            <div class="Objective" >
+                                <p style="font-weight: bold;font-style: italic;font-size: 18px;">OBJECTIVES:</p>
+                                <p style="font-size: 14px;">' . $final_summary . '</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3 " >
+                    <div class="infoRightSection">
+                        <div class="extraDetails">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>');
+$mpdf->Output();
+//
+////parsing html to pdf
+//try {
+//    $mpdf = new Mpdf($mpdfConfig);
+//} catch (\Mpdf\MpdfException $e) {
+//}
+//try {
+//    $mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
+//} catch (\Mpdf\MpdfException $e) {
+//}
+//try {
+//    $mpdf->WriteHTML($stylesheet2, HTMLParserMode::HEADER_CSS);
+//} catch (\Mpdf\MpdfException $e) {
+//}
+//try {
+//    $mpdf->WriteHTML($html, HTMLParserMode::HTML_BODY);
+//} catch (\Mpdf\MpdfException $e) {
+//}
+//try {
+//    $mpdf->Output();
+//} catch (\Mpdf\MpdfException $e) {
+//}
