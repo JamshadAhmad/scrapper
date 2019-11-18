@@ -2,6 +2,7 @@
 use Mpdf\HTMLParserMode;
 use Mpdf\Mpdf;
 use DiDom\Document;
+use Mpdf\MpdfException;
 
 $location = __DIR__ .'/output/';
 
@@ -35,21 +36,6 @@ do{
 $document = new Document($finalHtml);
 $spans = $document->find('span');
 
-
-
-//foreach($spans as $span) {
-//     if (trim(getFontSize($span -> style), "px") == 20)
-//     {
-//         $title .= $span -> text();
-//     }
-//     elseif (trim(getFontSize($span -> style), "px") == 16 && ($span -> text()) == "Summary")
-//     {
-//         $summary
-//     }
-//    echo ("   " . $span -> text());
-//    echo ("\n");
-//}
-
 $i = -1;
 
 foreach($spans as $span) {
@@ -62,8 +48,6 @@ foreach($spans as $span) {
         $sections[$i][$heading][] = $span -> text();
     }
 }
-//print_r($sections);
-//die;
 
 $summary = [];
 $experience = [];
@@ -71,10 +55,7 @@ $education = [];
 $title = '';
 
 $sec_len = count($sections);
-//print_r($sections[3]['bigheading']);
-//print_r($sections[4]['bigheading']);
-//print_r($sections[5]['bigheading']);
-//die;
+
 
 for($x = 3;$x < 6;$x++)
 {
@@ -92,14 +73,43 @@ for($x = 3;$x < 6;$x++)
     }
 }
 
+//CALCULATE LINES
+
 //summary
+//print_r($summary);die;
 $ex = convertPropertext($summary);
+$final_summary = bulletCheck($ex);
+$final_summary = str_replace("\n \n", "\n", $final_summary);
+
+//echo $final_summary;die;
+$ex = explode("\n",$final_summary);
+$l = count($ex);
+//print_r($ex);die;
+$s = '';
+//for($i = 0 ;$i<$l;$i++){
+//    $s .= adjustLines($ex[$i]);
+//}
+//echo adjustLines($ex[15]);die;
+//echo $s;die;
+$test = "my name is khan shahzeen and i live in lahore gulberg 3 pakistan asia annanas a andy order imma like to eat chocolate plus i'm an independentant fanners aas andy gorder imma like to eat chocolate plus i'm a barcleona fanas";
+echo adjustLines($test);die;
+//$len = count($test);
+//echo strrev(strrev($test));die;
+//echo strlen($test);die;
+//for ($i = 0; $i < $len; ++$i) {
+
+//echo adjustLines($test);die;
+//}
+
+
 $final_summary = bulletCheck($ex);
 $final_summary = str_replace("<br> <br>", "<br>", $final_summary);
 
 //experience
 $ex2 = convertPropertext($experience);
 
+
+//print_r($final_summary);die;
 
 $html = '';
 $html .= '
@@ -123,12 +133,11 @@ $html .= '
                     <div class="infoLeftSection">
                         <div class="mainDetails" >
                             <div class="Objective" >
-                                <p style="font-weight: bold;font-style: italic;font-size: 18px;">OBJECTIVES:</p>
-                                <p style="font-size: 14px;">' . $final_summary . '</p>
+                                <p style="font-weight: bold;font-size: 18px;letter-spacing: -0.5px;">RESUME OBJECTIVES:</p>
+                                <p class ="final" style="font-size: 14px;">' . $final_summary . '</p>
                             </div>
                             <div class="Experience">
                                 <p id="PE" style="font-weight: bold;font-style: italic;font-size: 16px;">EXPERIENCE:</p>
-                                <p>' . $ex2 . '</p>
                             </div>
                         </div>
                     </div>
@@ -164,126 +173,34 @@ $stylesheet2 = file_get_contents('lib/main.css');
 $mpdfConfig = array(
     'mode' => 'utf-8',
     'format' => 'A4',
-    'default_font_size' => 0,
-    'default_font' => 'serif',
     'margin_left' => 0,
     'margin_right' => 0,
     'margin_top' => 0,
     'margin_bottom' => 0,
-    'margin_header' => 0,
     'margin_footer' => 0,
     'orientation' => 'P',
 );
 
-$mpdf = new Mpdf($mpdfConfig);
-$mpdf->SetDisplayMode('fullpage');
-$mpdf->AddPage();
-$mpdf->WriteHTML('<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8"> 
-        <meta name="viewport" content="width=device-width"/>
-        <link type="text/css" rel="stylesheet" href="lib/main.css">
-        <link type="text/css" rel="stylesheet" href="lib/bootstrap.min.css">
-    </head>        
-    <body>
-        <div class="cvName container-fluid text-center">
-            <div class="mainHeading">
-                <h1 id="yay">' . $sections[0]['hugeheading'] . ' </h1>
-            </div>
-        </div>
-        <div class="container-fluid">
-            <div class="row">   
-                <div class="col-xs-8" style="width: 69.99%;!important;">
-                    <div class="infoLeftSection">
-                        <div class="mainDetails" >
-                            <div class="Objective" >
-                                <p style="font-weight: bold;font-style: italic;font-size: 18px;">OBJECTIVES:</p>
-                                <p style="font-size: 14px;">' . $final_summary . '</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-3 " >
-                    <div class="infoRightSection">
-                        <div class="extraDetails">
-                            <div class="email">
-                                <p style="font-weight: bold">Email:</p>
-                                <p>' . $the_big_array[10][2] . '</p>
-                            </div>
-                            <div class="phone">
-                                <p style="font-weight: bold">Phone:</p>
-                                <p>' . $the_big_array[10][3] . '</p>
-                            </div>
-                            <div class="linkL">
-                                <p style="font-weight: bold">Link:</p>
-                                ' . $the_big_array[10][1] . '
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>');
-$mpdf->AddPage();
-$mpdf->WriteHTML('
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8"> 
-        <meta name="viewport" content="width=device-width"/>
-        <link type="text/css" rel="stylesheet" href="lib/main.css">
-        <link type="text/css" rel="stylesheet" href="lib/bootstrap.min.css">
-    </head>        
-    <body>
-        <div class="cvName container-fluid text-center">
-            <div class="mainHeading">
-                <h1 id="yay">PAGE1</h1>
-            </div>
-        </div>
-        <div class="container-fluid">
-            <div class="row">   
-                <div class="col-xs-8" style="width: 65%;!important;">
-                    <div class="infoLeftSection">
-                        <div class="mainDetails" >
-                            <div class="Objective" >
-                                <p style="font-weight: bold;font-style: italic;font-size: 18px;">OBJECTIVES:</p>
-                                <p style="font-size: 14px;">' . $final_summary . '</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-3 " >
-                    <div class="infoRightSection">
-                        <div class="extraDetails">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>');
-$mpdf->Output();
-//
-////parsing html to pdf
-//try {
-//    $mpdf = new Mpdf($mpdfConfig);
-//} catch (\Mpdf\MpdfException $e) {
-//}
-//try {
-//    $mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
-//} catch (\Mpdf\MpdfException $e) {
-//}
-//try {
-//    $mpdf->WriteHTML($stylesheet2, HTMLParserMode::HEADER_CSS);
-//} catch (\Mpdf\MpdfException $e) {
-//}
-//try {
-//    $mpdf->WriteHTML($html, HTMLParserMode::HTML_BODY);
-//} catch (\Mpdf\MpdfException $e) {
-//}
-//try {
-//    $mpdf->Output();
-//} catch (\Mpdf\MpdfException $e) {
-//}
+
+//parsing html to pdf
+try {
+    $mpdf = new Mpdf($mpdfConfig);
+
+} catch (MpdfException $e) {
+}
+try {
+    $mpdf->WriteHTML($stylesheet, HTMLParserMode::HEADER_CSS);
+} catch (MpdfException $e) {
+}
+try {
+    $mpdf->WriteHTML($stylesheet2, HTMLParserMode::HEADER_CSS);
+} catch (MpdfException $e) {
+}
+try {
+    $mpdf->WriteHTML($html, HTMLParserMode::HTML_BODY);
+} catch (MpdfException $e) {
+}
+try {
+    $mpdf->Output();
+} catch (MpdfException $e) {
+}
