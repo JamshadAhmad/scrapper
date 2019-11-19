@@ -10,7 +10,7 @@ function convertPropertext($text)
     $string = '';
     $len = count($text);
     for ($i = 0; $i < $len; ++$i) {
-        if (strlen($text[$i]) <= 75) {
+        if (strlen($text[$i]) <= 76) {
             $string .= $text[$i] . "<br>";
         } else {
             $string .= ' ' . $text[$i];
@@ -36,13 +36,13 @@ function getFontSize($styleString)
 
 /***
  * @param $fontsize
- * @return string
+ * @return number
  */
 function whichHeading($fontsize) {
-    if ((int)$fontsize >= 20 ) return 'hugeheading';
-    elseif((int)$fontsize >= 15 ) return 'bigheading';
-    elseif((int)$fontsize >= 13 ) return 'subheading';
-    else return 'text';
+    if ((int)$fontsize >= 20 ) return 0;
+    elseif((int)$fontsize >= 15 ) return 1;
+    elseif((int)$fontsize >= 13 ) return 2;
+    else return 3;
 }
 
 /**
@@ -71,7 +71,9 @@ function adjustLines($test){
     else {
         while ($t_s != '') {
             $test_len = strlen($t_s);
-            if ($test_len >= 76 && $t_s[76] != ' ') {
+            if ($test_len < 76) {
+                $end = $test_len;
+            } elseif ($test_len >= 76 && $t_s[76] != ' ') {
                 $end = $end - strpos(strrev(substr($t_s, 0, $end)), ' ');
             }
             $str .= substr($t_s, 0, $end) . "<br>";
