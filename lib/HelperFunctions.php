@@ -11,13 +11,12 @@ function convertPropertext($text)
     $len = count($text);
     for ($i = 0; $i < $len; ++$i) {
         if (strlen($text[$i]) <= 75) {
-            $string .= $text[$i] . "\n";
+            $string .= $text[$i] . "<br>";
         } else {
             $string .= ' ' . $text[$i];
         }
     }
     return $string;
-//    return str_replace("\n", "<br>", $string);
 }
 
 /**
@@ -52,7 +51,7 @@ function whichHeading($fontsize) {
  */
 function bulletCheck ($text)
 {
-   return str_replace('•',"\n •", $text);
+   return str_replace('•',"<br> •", $text);
 }
 
 /**
@@ -63,41 +62,22 @@ function bulletCheck ($text)
 function adjustLines($test){
 
     $str = '';
+    $t_s = $test;
     $test_len = strlen($test);
-    $req_len = ceil($test_len / 74) + 1;
-    $start =0;
-    $total_chars = 75;
-    $end = 75;
-
-    if ($test_len < 75) {
-        $str .= $test . "\n";
+    $end = 76;
+    if ($test_len < 76) {
+        $str .= $test . "<br>";
     }
-    else if ($test_len >= 75) {
-        while()
-        {
-            if ($test[$end] != ' ') {
-                $str_update = $end - strpos(strrev(substr($test, $start, $total_chars)), ' ');
-                $str_update = $str_update - $start;
-                $str .= substr($test, $start, $str_update) . "\n";
-                echo "START: " . $start . "\n END: " . $end . "\n UPDATE: " . $str_update . "\n";
-                $start = $start + $str_update;
-                $end = $start + $total_chars;
-//                echo $start . " " . $total_chars;
-                if ($end >= $test_len) {
-                    echo $end;
-                    $end = $test_len;
-                    echo "last\n";
-                    $a = $req_len -1;
-                }
-//                echo $a . "{}";
-            } else {
-                $str .= substr($test, $start, $total_chars) . "\n";
-                $start = $start + $total_chars;
-                echo $a . "--";
+    else {
+        while ($t_s != '') {
+            $test_len = strlen($t_s);
+            if ($test_len >= 76 && $t_s[76] != ' ') {
+                $end = $end - strpos(strrev(substr($t_s, 0, $end)), ' ');
             }
-            echo $str . "\n";
+            $str .= substr($t_s, 0, $end) . "<br>";
+            $t_s = trim(substr($t_s, $end));
+            $end = 76;
         }
     }
-die;
     return $str;
 }
