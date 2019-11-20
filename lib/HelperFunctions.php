@@ -36,13 +36,13 @@ function getFontSize($styleString)
 
 /***
  * @param $fontsize
- * @return number
+ * @return string
  */
 function whichHeading($fontsize) {
-    if ((int)$fontsize >= 20 ) return 0;
-    elseif((int)$fontsize >= 15 ) return 1;
-    elseif((int)$fontsize >= 13 ) return 2;
-    else return 3;
+    if ((int)$fontsize >= 20 ) return 'hugeheading';
+    elseif((int)$fontsize >= 15 ) return 'bigheading';
+    elseif((int)$fontsize >= 13 ) return 'subheading';
+    else return 'text';
 }
 
 /**
@@ -59,27 +59,31 @@ function bulletCheck ($text)
  * @return string
  */
 
-function adjustLines($test){
+function adjustLines($test)
+{
 
-    $str = '';
-    $t_s = $test;
-    $test_len = strlen($test);
-    $end = 76;
-    if ($test_len < 76) {
-        $str .= $test . "<br>";
-    }
-    else {
-        while ($t_s != '') {
-            $test_len = strlen($t_s);
-            if ($test_len < 76) {
-                $end = $test_len;
-            } elseif ($test_len >= 76 && $t_s[76] != ' ') {
-                $end = $end - strpos(strrev(substr($t_s, 0, $end)), ' ');
+    try {
+        $str = '';
+        $t_s = $test;
+        $test_len = strlen($test);
+        $end = 75;
+        if ($test_len < 75) {
+            $str .= $test . "<br>";
+        } else {
+            while ($t_s != '') {
+                $test_len = strlen($t_s);
+                if ($test_len < 75) {
+                    $end = $test_len;
+                } elseif ($test_len >= 75) {
+                    $end = $end - strpos(strrev(substr($t_s, 0, $end)), ' ');
+                }
+                $str .= substr($t_s, 0, $end) . "<br>";
+                $t_s = trim(substr($t_s, $end));
+                $end = 75;
             }
-            $str .= substr($t_s, 0, $end) . "<br>";
-            $t_s = trim(substr($t_s, $end));
-            $end = 76;
         }
+        return $str;
+    } catch (\Exception $e) {
+        echo $e->getMessage();
     }
-    return $str;
 }
