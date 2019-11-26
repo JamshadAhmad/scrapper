@@ -76,7 +76,7 @@ for($i = 0; $i < $big_len; $i++) {
 }
 
 $file_count = count($the_big_array);
-for($file = 3; $file <5; $file++) {
+for($file = 1; $file <10; $file++) {
     try {
         shell_exec('lib/pdftohtml input/' . $the_big_array[$file][$pdfNameIndex] . '.pdf tmp' . $file);
         shell_exec('chmod 777 -R tmp' . $file);
@@ -151,16 +151,54 @@ for($file = 3; $file <5; $file++) {
             $s2 = '';
         }
 
-//CALCULATE LINES
+//education
+        if($education != null){
+            $ex3 = convertPropertext($education);
+            $final_edu = bulletCheck($ex3);
+            $final_edu = str_replace("<br> <br>", "<br>", $final_edu);
+            $ex3 = explode("<br>", $final_edu);
+            $ca = count($ex3);
+            $c2 = '';
+            for ($i = 0; $i < $ca; $i++) {
+                $c2 .= adjustLines($ex3[$i]);
+            }
+        }
+        else{
+            $c2 = '';
+        }
 
-//        $summary_lines = count(explode('<br>',$s));
-//        $experience_lines = count(explode('<br>',$s2));
-////        $education_lines =
-//
-//        if()
-//
-//        $total_lines = count(explode('<br>',$s));
-//        $total_lines = $total_lines + count(explode())
+//CALCULATE LINES
+        $firstPage_FLAG = false;
+        $newPage_FLAG = true;
+        $summary_lines = count(explode('<br>',$s));
+        $s = array_slice(explode('<br>',$s),0,$summary_lines-1);
+        $summary_lines = count($s);
+        $s = implode('<br>',$s);
+        $experience_lines = count(explode('<br>',$s2));
+
+        $total_lines = $summary_lines+$experience_lines;
+        if($total_lines < 49) {
+            $newPage_FLAG = false;
+        }
+
+        if($summary_lines < 44) {
+            if (48 - ($summary_lines + 5) == 0 || 48 - ($summary_lines + 5) == 1 || 48 - ($summary_lines + 5) == 2) {
+                $expGetLines = $s2;
+                $firstPage_FLAG = true;
+            } else {
+                $expGetLines = implode('<br>', array_slice(explode('<br>', $s2), 0, 48 - ($summary_lines + 5)));
+                $remainExpLines = implode('<br>', array_slice(explode('<br>', $s2), 48 - ($summary_lines + 5)));
+            }
+        }
+//        else {
+//            $rawDataSum = explode('<br>',$s);
+//            $total_lines = $summary_lines + 3;
+//            $getSum48Lines = array_slice($rawDataSum,0,48);
+//            $getSumRemains = array_slice($rawDataSum,48);
+//            $firstPageSum = implode('<br>',$getSum48Lines);
+//            $NextPageSum = implode('<br>',$getSumRemains);
+//            $firstPage_FLAG = true;
+//        }
 
 
 
@@ -204,12 +242,10 @@ for($file = 3; $file <5; $file++) {
                             <div class="address">
                             </div>
                             <div class="skills">
-                                <div class="skill2">
-                                </div>
-                                <div class="skill3">
-                                </div>
                             </div>
                             <div class="language">
+                            </div>
+                            <div class="education">
                             </div>
                         </div>
                     </div>
@@ -218,6 +254,9 @@ for($file = 3; $file <5; $file++) {
         </div>
     </body>
 </html>';
+
+
+        $htmlNew = returnString();
 
         /**
          * COLUMN-8 Tags
@@ -241,13 +280,19 @@ for($file = 3; $file <5; $file++) {
         $experience_tag = '
     <div class="Experience">
         <p id="PE" style="font-weight: bold;font-style: italic;font-size: 16px;">EXPERIENCE:</p>
-        <p class ="final" style="font-size: 13.3px; color: black;font-weight: lighter">' . $s2 . '</p>
+        <p class ="final" style="font-size: 13.3px; color: black;font-weight: lighter">' . $expGetLines . '</p>
     </div>';
 
 
         /**
          * COLUMN-3 Tags
          */
+        $education_tag = '
+    <div class="education">
+        <p style="font-weight: bold;font-style: italic;font-size: 16px;">EDUCATION:</p>
+        <p class ="final" style="font-size: 12px; color: black;font-weight: lighter">' . $c2 . '</p>
+    </div>';
+
         $email_tag = '
     <div class="email" style="line-height: 85%;">
         <div class="row" style="padding: 0; margin: 0">
@@ -328,9 +373,24 @@ for($file = 3; $file <5; $file++) {
          * EXPERIENCE REPLACEMENT
          */
         try {
-            if ($s2 != '') {
+            if ($s2 != '' && $firstPage_FLAG == false) {
                 $html1 = str_replace('<div class="Experience">
                             </div>', $experience_tag, $html1);
+            }
+            elseif($firstPage_FLAG == true){
+                $htmlNew = str_replace('<div class="Experience">
+                            </div>', $experience_tag, $htmlNew);
+            }
+        } catch (Throwable $e) {
+        }
+
+        /**
+         * EDUCATION REPLACEMENT
+         */
+        try {
+            if ($c2 != '') {
+                $html1 = str_replace('<div class="education">
+                            </div>', $education_tag, $html1);
             }
         } catch (Throwable $e) {
         }
@@ -369,6 +429,42 @@ for($file = 3; $file <5; $file++) {
         }
 
         /**
+         * SKILLS REPLACEMENT
+         */
+        try {
+            $skill_data='';
+            if ($the_big_array[$file][$skills1Index] != "NA" &&
+                $the_big_array[$file][$skills1Index] != "N/A" ||
+                $the_big_array[$file][$skills2Index] != "NA" &&
+                $the_big_array[$file][$skills2Index] != "N/A" ||
+                $the_big_array[$file][$skills3Index] != "NA" &&
+                $the_big_array[$file][$skills3Index] != "N/A")
+            {
+                $skill_data .= '
+                <div class="skills" style="line-height: 135%;">
+                    <p style="font-weight: bold;letter-spacing: -0.9px;">SKILLS</p>';
+                if($the_big_array[$file][$skills1Index] != "NA" &&
+                    $the_big_array[$file][$skills1Index] != "N/A"){
+                    $skill_data .='<p id="side">' . $the_big_array[$file][$skills1Index] . '</p>';
+                }
+                if($the_big_array[$file][$skills2Index] != "NA" &&
+                    $the_big_array[$file][$skills2Index] != "N/A"){
+                    $skill_data .='<p id="side">' . $the_big_array[$file][$skills2Index] . '</p>';
+                }
+                if($the_big_array[$file][$skills3Index] != "NA" &&
+                    $the_big_array[$file][$skills3Index] != "N/A"){
+                    $skill_data .='<p id="side">' . $the_big_array[$file][$skills3Index] . '</p>';
+                }
+                $skill_data .='</div><br>';
+                $html1 = str_replace('<div class="skills">
+                            </div>', $skill_data, $html1);
+                echo "REPLACED";
+            }
+
+        } catch (Throwable $e) {
+        }
+
+        /**
          * LANGUAGE REPLACEMENT
          */
         try {
@@ -381,19 +477,19 @@ for($file = 3; $file <5; $file++) {
                 $the_big_array[$file][$languages3Index] != "N/A")
             {
                 $lan_data .= '
-                <div class="languages" style="line-height: 85%;">
-                    <p style="font-weight: bold">Languages:</p>';
+                <div class="languages" style="line-height: 135%" >
+                    <p style="font-weight: bold; letter-spacing: -0.9px;">LANGUAGES</p>';
                 if($the_big_array[$file][$languages1Index] != "NA" &&
                     $the_big_array[$file][$languages1Index] != "N/A"){
-                    $lan_data .='<p>' . $the_big_array[$file][$languages1Index] . '</p>';
+                    $lan_data .='<p id="side">' . $the_big_array[$file][$languages1Index] . '</p>';
                 }
                 if($the_big_array[$file][$languages2Index] != "NA" &&
                     $the_big_array[$file][$languages2Index] != "N/A"){
-                    $lan_data .='<p>' . $the_big_array[$file][$languages2Index] . '</p>';
+                    $lan_data .='<p id="side">' . $the_big_array[$file][$languages2Index] . '</p>';
                 }
                 if($the_big_array[$file][$languages3Index] != "NA" &&
                     $the_big_array[$file][$languages3Index] != "N/A"){
-                    $lan_data .='<p>' . $the_big_array[$file][$languages3Index] . '</p>';
+                    $lan_data .='<p id="side">' . $the_big_array[$file][$languages3Index] . '</p>';
                 }
                 $lan_data .='</div>';
                 $html1 = str_replace('<div class="language">
@@ -404,7 +500,6 @@ for($file = 3; $file <5; $file++) {
         } catch (Throwable $e) {
         }
 
-//        echo $html1;die;
         $stylesheet = file_get_contents('lib/bootstrap.min.css');
         $stylesheet2 = file_get_contents('lib/main.css');
         $mpdfConfig = array(
@@ -418,6 +513,7 @@ for($file = 3; $file <5; $file++) {
             'orientation' => 'P'
         );
 
+//        echo $html1;die;
 
 
         $s='';
@@ -437,15 +533,18 @@ for($file = 3; $file <5; $file++) {
         }
         try {
             $mpdf->WriteHTML($html1, HTMLParserMode::HTML_BODY);
+
         } catch (MpdfException $e) {
         }
         try {
+            $resumeName = explode(' ',$sections[0]['hugeheading']);
             shell_exec('rm -rf tmp' . $file);
-            $mpdf->Output('output/CV' . $the_big_array[$file][$pdfNameIndex] . '.pdf', \Mpdf\Output\Destination::FILE);
+            $mpdf->Output('output/' . $resumeName[0] . '_' . $resumeName[1] . '-Accountant_Manager-New_Jersey .pdf', \Mpdf\Output\Destination::FILE);
             shell_exec('chmod 777 -R output');
         } catch (MpdfException $e) {
         }
     } catch (Throwable $e) {
+        echo $file . "->  " . $e->getMessage() . $e->getLine() . "\n";
     }
     $summary= null;
     $experience = null;

@@ -67,14 +67,14 @@ function adjustLines($test)
         $t_s = $test;
         $test_len = strlen($test);
         $end = 75;
-        if ($test_len < 75) {
+        if ($test_len < 76) {
             $str .= $test . "<br>";
         } else {
             while ($t_s != '') {
                 $test_len = strlen($t_s);
-                if ($test_len < 75) {
+                if ($test_len < 76) {
                     $end = $test_len;
-                } elseif ($test_len >= 75) {
+                } elseif ($test_len >= 76) {
                     $end = $end - strpos(strrev(substr($t_s, 0, $end)), ' ');
                 }
                 $str .= substr($t_s, 0, $end) . "<br>";
@@ -86,4 +86,46 @@ function adjustLines($test)
     } catch (\Exception $e) {
         echo $e->getMessage();
     }
+}
+
+
+/**
+ * Second Page HTML Structure Return
+ * @return String
+ */
+
+function returnString () {
+    $html2 = '
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width"/>
+        <link type="text/css" rel="stylesheet" href="lib/main.css">
+        <link type="text/css" rel="stylesheet" href="lib/bootstrap.min.css">
+    </head>        
+    <body>
+        <div class="container-fluid">
+            <div class="row">   
+                <div class="col-xs-8" style="width: 69.99%;!important;">
+                    <div class="infoLeftSection">
+                        <div class="mainDetails" >
+                            <div class="Objective" >
+                            </div>
+                            <div class="Experience">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3 " >
+                    <div class="infoRightSection">
+                        <div class="extraDetails">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>';
+    return $html2;
 }
