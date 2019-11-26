@@ -34,6 +34,21 @@ function getFontSize($styleString)
     }
 }
 
+/**
+ * @param $styleString
+ * @return mixed
+ */
+function getTextColor($styleString)
+{
+    $styles = explode(';', $styleString);
+    foreach ($styles as $style) {
+        $substyle = explode(':', $style);
+        if ($substyle[0] === 'color') {
+            return $substyle[1];
+        }
+    }
+}
+
 /***
  * @param $fontsize
  * @return string
@@ -90,42 +105,41 @@ function adjustLines($test)
 
 
 /**
- * Second Page HTML Structure Return
- * @return String
+ * @param $data
+ * @return string
  */
+function returnMeaningFullData($data){
+    if ($data != null) {
+        $ex = convertPropertext($data);
+        $final_summary = bulletCheck($ex);
+        $final_summary = str_replace("<br> <br>", "<br>", $final_summary);
+        $ex = explode("<br>", $final_summary);
+        $l = count($ex);
+        $s = '';
+        for ($i = 0; $i < $l; $i++) {
+            $s .= adjustLines($ex[$i]);
+        }
+    } else {
+        $s = '';
+    }
 
-function returnString () {
-    $html2 = '
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8"> 
-        <meta name="viewport" content="width=device-width"/>
-        <link type="text/css" rel="stylesheet" href="lib/main.css">
-        <link type="text/css" rel="stylesheet" href="lib/bootstrap.min.css">
-    </head>        
-    <body>
-        <div class="container-fluid">
-            <div class="row">   
-                <div class="col-xs-8" style="width: 69.99%;!important;">
-                    <div class="infoLeftSection">
-                        <div class="mainDetails" >
-                            <div class="Objective" >
-                            </div>
-                            <div class="Experience">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-3 " >
-                    <div class="infoRightSection">
-                        <div class="extraDetails">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>';
-    return $html2;
+    return $s;
+}
+
+/**
+ * @param $data
+ * @return string
+ */
+function returnEducation($data)
+{
+    $edu = '';
+    for ($i = 0; $i < count($data); $i++) {
+        if ($i % 2 == 0) {
+            $edu .= $data[$i] . '<b><br>';
+        } else {
+            $edu .= $data[$i] . '<br>';
+        }
+    }
+
+    return $edu;
 }
