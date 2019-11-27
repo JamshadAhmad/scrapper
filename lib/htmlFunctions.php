@@ -156,6 +156,19 @@ function getObjectiveTag($data){
  * @param $data
  * @return string
  */
+function getObjectiveTag2($data){
+    $objective_tag = '
+    <div class="Objective" >
+        <p class ="final" style="font-size: 13.3px; color: black;font-weight: lighter">' . $data . '</p>
+    </div>';
+
+    return $objective_tag;
+}
+
+/**
+ * @param $data
+ * @return string
+ */
 function getExperienceTag($data)
 {
     $experience_tag = '
@@ -167,6 +180,19 @@ function getExperienceTag($data)
     return $experience_tag;
 }
 
+/**
+ * @param $data
+ * @return string
+ */
+function getExperienceTag2($data)
+{
+    $experience_tag = '
+    <div class="Experience">
+        <p class ="final" style="font-size: 13.3px; color: black;font-weight: lighter">' . $data . '</p>
+    </div>';
+
+    return $experience_tag;
+}
 
 
 /**

@@ -67,6 +67,27 @@ function objectiveTagReplace($data,$replace)
     }
 }
 
+/**
+ * OBJECTIVE REPLACEMENT WITHOUT HEADING
+ *
+ * @param $data
+ * @param $replace
+ * @return string
+ */
+function objectiveTagReplace2($data,$replace)
+{
+    try {
+        if ($data != '') {
+            $replace = str_replace('<div class="Objective" >
+                            </div>', getObjectiveTag2($data), $replace);
+            return $replace;
+        } else {
+            return $replace;
+        }
+    } catch (Throwable $e) {
+    }
+}
+
 
 /**
  * EXPERIENCE REPLACEMENT
@@ -80,6 +101,26 @@ function experienceTagReplace($data,$replace){
         if ($data != '') {
             $replace = str_replace('<div class="Experience">
                             </div>', getExperienceTag($data), $replace);
+            return $replace;
+        } else {
+            return $replace;
+        }
+    } catch (Throwable $e) {
+    }
+}
+
+/**
+ * EXPERIENCE REPLACEMENT WITHOUT HEADING
+ *
+ * @param $data
+ * @param $replace
+ * @return mixed
+ */
+function experienceTagReplace2($data,$replace){
+    try {
+        if ($data != '') {
+            $replace = str_replace('<div class="Experience">
+                            </div>', getExperienceTag2($data), $replace);
             return $replace;
         } else {
             return $replace;

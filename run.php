@@ -79,7 +79,7 @@ for ($i = 0; $i < $big_len; $i++) {
 }
 
 $file_count = count($the_big_array);
-for ($file = 1; $file < 4; $file++) {
+for ($file = 10; $file < 11; $file++) {
     try {
         shell_exec('lib/pdftohtml input/' . $the_big_array[$file][$pdfNameIndex] . '.pdf tmp' . $file);
         shell_exec('chmod 777 -R tmp' . $file);
@@ -133,63 +133,170 @@ for ($file = 1; $file < 4; $file++) {
         $summary_lines = count($getSummary);
         $getSummary = implode('<br>', $getSummary);
         $experience_lines = count(explode('<br>', $getExperience));
-
-
         $total_lines = $summary_lines + $experience_lines + 3;
 
-//        while ($total_lines != 0)
-//        {
+        $summaryContinue_FLAG = false;
+        $experienceContinue_FLAG = false;
+        $htmlFirstPage = fPageHtml();
+
             //NEW PAGE DOESNT EXIST
-            if ($total_lines < 49) {
-                $newPage_FLAG = false;
-            } else {
-                if ($summary_lines < 44) {
-                    if (48 - ($summary_lines + 5) < 3) {
+            if ($total_lines <= 49) {
+                $d = [];
+                $d2 = [];
+                $d[0] = $the_big_array[$file][$skills1Index];
+                $d[1] = $the_big_array[$file][$skills2Index];
+                $d[2] = $the_big_array[$file][$skills3Index];
+                $d2[0] = $the_big_array[$file][$languages1Index];
+                $d2[1] = $the_big_array[$file][$languages2Index];
+                $d2[2] = $the_big_array[$file][$languages3Index];
+                $htmlFirstPage = nameTagReplace($sections[0]['hugeheading'], $htmlFirstPage);
+                $htmlFirstPage = subNameTagReplace($sections[2]['subheading'], $htmlFirstPage);
+                $htmlFirstPage = objectiveTagReplace($getSummary, $htmlFirstPage);
+                $htmlFirstPage = experienceTagReplace($getExperience, $htmlFirstPage);
+                $htmlFirstPage = educationTagReplace($getEducation, $htmlFirstPage);
+                $htmlFirstPage = emailTagReplace($the_big_array[$file][$emailIndex], $htmlFirstPage);
+                $htmlFirstPage = phoneTagReplace($the_big_array[$file][$phoneNumberIndex], $htmlFirstPage);
+                $htmlFirstPage = addressTagReplace($sections[1]['subheading'], $htmlFirstPage);
+                $htmlFirstPage = skillTagReplace($d, $htmlFirstPage);
+                $htmlFirstPage = languageTagReplace($d2, $htmlFirstPage);
+                $summaryContinue_FLAG = false;
+                $experienceContinue_FLAG = false;
+                $total_lines = 0;
+                $summary_lines =0;
+                $experience_lines=0;
+            }
+            else { //total line > 49
+                if ($summary_lines < 48) {
+                    if (48 - ($summary_lines) < 3) {
+                        // SUMMARY WHOLE
+                        // EXPERIENCE PARTIAL
                         $expGetLines = $getExperience;
-                        $total_lines = $experience_lines + 1;
-                        $firstPageDisplayExp_FLAG = false;
-                    } else {
-                        $expGetLines = implode('<br>', array_slice(explode('<br>', $getExperience), 0, 48 - ($summary_lines + 5)));
-                        $remainExpLines = implode('<br>', array_slice(explode('<br>', $getExperience), 48 - ($summary_lines + 5)));
+                        $summary_lines=0;
+                        $total_lines = $experience_lines;
+                        $d = [];
+                        $d2 = [];
+                        $d[0] = $the_big_array[$file][$skills1Index];
+                        $d[1] = $the_big_array[$file][$skills2Index];
+                        $d[2] = $the_big_array[$file][$skills3Index];
+                        $d2[0] = $the_big_array[$file][$languages1Index];
+                        $d2[1] = $the_big_array[$file][$languages2Index];
+                        $d2[2] = $the_big_array[$file][$languages3Index];
+                        $htmlFirstPage = nameTagReplace($sections[0]['hugeheading'], $htmlFirstPage);
+                        $htmlFirstPage = subNameTagReplace($sections[2]['subheading'], $htmlFirstPage);
+                        $htmlFirstPage = objectiveTagReplace($getSummary, $htmlFirstPage);
+                        $htmlFirstPage = educationTagReplace($getEducation, $htmlFirstPage);
+                        $htmlFirstPage = emailTagReplace($the_big_array[$file][$emailIndex], $htmlFirstPage);
+                        $htmlFirstPage = phoneTagReplace($the_big_array[$file][$phoneNumberIndex], $htmlFirstPage);
+                        $htmlFirstPage = addressTagReplace($sections[1]['subheading'], $htmlFirstPage);
+                        $htmlFirstPage = skillTagReplace($d, $htmlFirstPage);
+                        $htmlFirstPage = languageTagReplace($d2, $htmlFirstPage);
+                        $summaryContinue_FLAG = false;
+                        $experienceContinue_FLAG = false;
+                    }
+                    else {
+                        // SUMMARY WHOLE
+                        // EXP PARTIAL $expGetLines
+                        $expGetLines = implode('<br>', array_slice(explode('<br>', $getExperience), 0, 48 - ($summary_lines + 4)));
+                        $remainExpLines = implode('<br>', array_slice(explode('<br>', $getExperience), 48 - ($summary_lines + 4)));
+                        $d = [];
+                        $d2 = [];
+                        $d[0] = $the_big_array[$file][$skills1Index];
+                        $d[1] = $the_big_array[$file][$skills2Index];
+                        $d[2] = $the_big_array[$file][$skills3Index];
+                        $d2[0] = $the_big_array[$file][$languages1Index];
+                        $d2[1] = $the_big_array[$file][$languages2Index];
+                        $d2[2] = $the_big_array[$file][$languages3Index];
+                        $htmlFirstPage = nameTagReplace($sections[0]['hugeheading'], $htmlFirstPage);
+                        $htmlFirstPage = subNameTagReplace($sections[2]['subheading'], $htmlFirstPage);
+                        $htmlFirstPage = objectiveTagReplace($getSummary, $htmlFirstPage);
+                        $htmlFirstPage = experienceTagReplace($expGetLines, $htmlFirstPage);
+                        $htmlFirstPage = educationTagReplace($getEducation, $htmlFirstPage);
+                        $htmlFirstPage = emailTagReplace($the_big_array[$file][$emailIndex], $htmlFirstPage);
+                        $htmlFirstPage = phoneTagReplace($the_big_array[$file][$phoneNumberIndex], $htmlFirstPage);
+                        $htmlFirstPage = addressTagReplace($sections[1]['subheading'], $htmlFirstPage);
+                        $htmlFirstPage = skillTagReplace($d, $htmlFirstPage);
+                        $htmlFirstPage = languageTagReplace($d2, $htmlFirstPage);
+                        $total_lines = $total_lines - $summary_lines - count(explode('<br>',$expGetLines));
+                        $summaryContinue_FLAG = false;
+                        $experienceContinue_FLAG = true;
+                        $summary_lines=0;
+                        $experience_lines=$total_lines;
                     }
                 }
+                else {
+                    $sumLines = implode('<br>', array_slice(explode('<br>', $getSummary), 0, 48));
+                    $remainSumLines = implode('<br>', array_slice(explode('<br>', $getSummary), 48));
+                    $d = [];
+                    $d2 = [];
+                    $d[0] = $the_big_array[$file][$skills1Index];
+                    $d[1] = $the_big_array[$file][$skills2Index];
+                    $d[2] = $the_big_array[$file][$skills3Index];
+                    $d2[0] = $the_big_array[$file][$languages1Index];
+                    $d2[1] = $the_big_array[$file][$languages2Index];
+                    $d2[2] = $the_big_array[$file][$languages3Index];
+                    $htmlFirstPage = nameTagReplace($sections[0]['hugeheading'], $htmlFirstPage);
+                    $htmlFirstPage = subNameTagReplace($sections[2]['subheading'], $htmlFirstPage);
+                    $htmlFirstPage = objectiveTagReplace($sumLines, $htmlFirstPage);
+                    $htmlFirstPage = educationTagReplace($getEducation, $htmlFirstPage);
+                    $htmlFirstPage = emailTagReplace($the_big_array[$file][$emailIndex], $htmlFirstPage);
+                    $htmlFirstPage = phoneTagReplace($the_big_array[$file][$phoneNumberIndex], $htmlFirstPage);
+                    $htmlFirstPage = addressTagReplace($sections[1]['subheading'], $htmlFirstPage);
+                    $htmlFirstPage = skillTagReplace($d, $htmlFirstPage);
+                    $htmlFirstPage = languageTagReplace($d2, $htmlFirstPage);
+                    $total_lines = $total_lines - 48;
+                    $summaryContinue_FLAG = true;
+                    $summary_lines=$summary_lines-48;
+                }
             }
-//        }
 
-
-//        else {
-//            $rawDataSum = explode('<br>',$s);
-//            $total_lines = $summary_lines + 3;
-//            $getSum48Lines = array_slice($rawDataSum,0,48);
-//            $getSumRemains = array_slice($rawDataSum,48);
-//            $firstPageSum = implode('<br>',$getSum48Lines);
-//            $NextPageSum = implode('<br>',$getSumRemains);
-//            $firstPage_FLAG = true;
-//        }
-
-        $htmlFirstPage = fPageHtml(); // Getting the HTML of First Page
-        $htmlNew = returnString();     // Getting the HTML of Late Pages
-
-        $d=[];
-        $d2=[];
-        $d[0] = $the_big_array[$file][$skills1Index];
-        $d[1] = $the_big_array[$file][$skills2Index];
-        $d[2] = $the_big_array[$file][$skills3Index];
-        $d2[0] = $the_big_array[$file][$languages1Index];
-        $d2[1] = $the_big_array[$file][$languages2Index];
-        $d2[2] = $the_big_array[$file][$languages3Index];
-
-        $htmlFirstPage = nameTagReplace($sections[0]['hugeheading'],$htmlFirstPage);
-        $htmlFirstPage = subNameTagReplace($sections[2]['subheading'] ,$htmlFirstPage);
-        $htmlFirstPage = objectiveTagReplace($getSummary,$htmlFirstPage);
-        $htmlFirstPage = experienceTagReplace($getExperience,$htmlFirstPage);
-        $htmlFirstPage = educationTagReplace($getEducation,$htmlFirstPage);
-        $htmlFirstPage = emailTagReplace($the_big_array[$file][$emailIndex],$htmlFirstPage);
-        $htmlFirstPage = phoneTagReplace($the_big_array[$file][$phoneNumberIndex],$htmlFirstPage);
-        $htmlFirstPage = addressTagReplace($sections[1]['subheading'],$htmlFirstPage);
-        $htmlFirstPage = skillTagReplace($d,$htmlFirstPage);
-        $htmlFirstPage = languageTagReplace($d2,$htmlFirstPage);
-
+        $htmlLaterPages =[];
+            $pages=0;
+            while ($total_lines != 0) {
+                $htmlLaterPages[$pages] = returnString();
+                if ($total_lines <= 55) {
+                    if($summaryContinue_FLAG){
+                        $htmlLaterPages[$pages] = objectiveTagReplace2($remainSumLines, $htmlLaterPages[$pages]);
+                        $htmlLaterPages[$pages] = experienceTagReplace($getExperience, $htmlLaterPages[$pages]);
+                    }
+                    elseif ($experienceContinue_FLAG){
+                        $htmlLaterPages[$pages] = experienceTagReplace2($remainExpLines, $htmlLaterPages[$pages]);
+                    }
+                    else {
+                        $htmlLaterPages[$pages] = experienceTagReplace2($getExperience, $htmlLaterPages[$pages]);
+                    }
+                    $total_lines = 0;
+                    $summary_lines=0;
+                    $experience_lines=0;
+                } else { //total line > 49
+                    if ($summary_lines < 55) {
+                        if (55 - ($summary_lines) < 3) {
+                            // SUMMARY WHOLE
+                            // EXPERIENCE PARTIAL
+                            $expGetLines = $getExperience;
+                            $total_lines = $experience_lines;
+                            $htmlLaterPages[$pages] = objectiveTagReplace2($remainSumLines, $htmlLaterPages[$pages]);
+                            $summary_lines=0;
+                        } else {
+                            // SUMMARY WHOLE
+                            // EXP PARTIAL $expGetLines
+                            $expGetLines = implode('<br>', array_slice(explode('<br>', $getExperience), 0, 55 - ($summary_lines + 4)));
+                            $remainExpLines = implode('<br>', array_slice(explode('<br>', $getExperience), 55 - ($summary_lines + 4)));
+                            $htmlLaterPages[$pages] = objectiveTagReplace2($remainSumLines, $htmlLaterPages[$pages]);
+                            $htmlLaterPages[$pages] = experienceTagReplace2($expGetLines, $htmlLaterPages[$pages]);
+                            $total_lines = $total_lines - $summary_lines - count(explode('<br>', $expGetLines));
+                            $summary_lines=0;
+                            $experience_lines=$total_lines;
+                        }
+                    } else {
+                        $sumLines = implode('<br>', array_slice(explode('<br>', $getSummary), 0, 55));
+                        $remainSumLines = implode('<br>', array_slice(explode('<br>', $getSummary), 55));
+                        $htmlLaterPages[$pages] = objectiveTagReplace2($sumLines, $htmlLaterPages[$pages]);
+                        $total_lines = $total_lines - 55;
+                        $summary_lines=$summary_lines - 55;
+                    }
+                }
+                $pages++;
+            }
 
         $stylesheet = file_get_contents('lib/bootstrap.min.css');
         $stylesheet2 = file_get_contents('lib/main.css');
@@ -221,8 +328,9 @@ for ($file = 1; $file < 4; $file++) {
         }
         try {
             $mpdf->WriteHTML($htmlFirstPage, HTMLParserMode::HTML_BODY);
-            if($newPage_FLAG){
-                // NEW PAGE
+            for ($i =0;$i < count($htmlLaterPages);$i++){
+                $mpdf->AddPage();
+                $mpdf->WriteHTML($htmlLaterPages[$i], HTMLParserMode::HTML_BODY);
             }
 
         } catch (MpdfException $e) {
