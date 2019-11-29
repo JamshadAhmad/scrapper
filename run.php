@@ -12,9 +12,10 @@ include 'lib/HelperFunctions.php';
 include 'lib/htmlFunctions.php';
 include 'lib/replaceFunctions.php';
 
+set_error_handler("myErrorHandler", E_ALL);
 ini_set('display_errors', 1);
-ini_set('max_execution_time', 600);
-set_time_limit(600);
+ini_set('max_execution_time', 99990);
+set_time_limit(99990);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
@@ -33,7 +34,7 @@ $skill3Heading = "Skills 3";
 $language1Heading = "Languages 1";
 $language2Heading = "Languages 2";
 $language3Heading = "Languages 3";
-$firstPageLinesLimit = 48;
+$firstPageLinesLimit = 47;
 $otherPageLinesLimit = 53;
 
 
@@ -97,8 +98,11 @@ for ($i = 0; $i < $big_len; $i++) {
     }
 }
 
+$addCsvData = fopen('generatedCSV.csv','w');
+$file_put = fopen('error_logs','w');
+fputcsv($addCsvData,["Unique_Id","Name","JobTitle","Summary","CV"],",");
 $file_count = count($csvDataArray);
-for ($file = 1; $file < 11; $file++) {
+for ($file = 1; $file < 1050; $file++) {
     try {
         shell_exec('lib/pdftohtml input/' . $csvDataArray[$file][$pdfNameIndex] . '.pdf tmp' . $file);
         shell_exec('chmod 777 -R tmp' . $file);
@@ -150,12 +154,13 @@ for ($file = 1; $file < 11; $file++) {
         $newPage_FLAG = true;
         $summaryContinue_FLAG = false;
         $experienceContinue_FLAG = false;
+        $expStart_FLAG = false;
         $summary_lines = count(explode('<br>', $getSummary));
         $getSummary = array_slice(explode('<br>', $getSummary), 0, $summary_lines - 1);
         $summary_lines = count($getSummary);
         $getSummary = implode('<br>', $getSummary);
         $experience_lines = count(explode('<br>', $getExperience));
-        $total_lines = $summary_lines + $experience_lines + 3;
+        $total_lines = $summary_lines + $experience_lines ;
         $htmlFirstPage = fPageHtml();
 
         //NEW PAGE DOESNT EXIST
@@ -184,12 +189,12 @@ for ($file = 1; $file < 11; $file++) {
             $summary_lines = 0;
             $experience_lines = 0;
         } else { //total line > 49
-            if ($summary_lines < $firstPageLinesLimit) {
+            if ($summary_lines <= $firstPageLinesLimit) {
                 if ($firstPageLinesLimit - ($summary_lines) < 3) {
                     // SUMMARY WHOLE
                     // EXPERIENCE PARTIAL
+                    $total_lines = $total_lines - $summary_lines;
                     $summary_lines = 0;
-                    $total_lines = $experience_lines;
                     $d = [];
                     $d2 = [];
                     $d[0] = $csvDataArray[$file][$skills1Index];
@@ -209,6 +214,7 @@ for ($file = 1; $file < 11; $file++) {
                     $htmlFirstPage = languageTagReplace($d2, $htmlFirstPage);
                     $summaryContinue_FLAG = false;
                     $experienceContinue_FLAG = false;
+                    $expStart_FLAG = true;
                 } else {
 
                     // SUMMARY WHOLE
@@ -259,9 +265,9 @@ for ($file = 1; $file < 11; $file++) {
                 $htmlFirstPage = addressTagReplace($sections[1]['subheading'], $htmlFirstPage);
                 $htmlFirstPage = skillTagReplace($d, $htmlFirstPage);
                 $htmlFirstPage = languageTagReplace($d2, $htmlFirstPage);
-                $total_lines = $total_lines - $firstPageLinesLimit;
+                $total_lines = $total_lines - count(explode('<br>',$sumLines));
                 $summaryContinue_FLAG = true;
-                $summary_lines = $summary_lines - $firstPageLinesLimit;
+                $summary_lines = $summary_lines - count(explode('<br>',$sumLines));
             }
         }
 
@@ -299,16 +305,16 @@ for ($file = 1; $file < 11; $file++) {
                         $htmlLaterPages[$pages] = objectiveTagReplace2($remainSumLines, $htmlLaterPages[$pages]);
                         $summary_lines = 0;
                     } else {
-//                            echo count(explode('<br>',$remainSumLines));
                         // SUMMARY WHOLE
                         // EXP PARTIAL $expGetLines
-//                            echo $summary_lines;
-                        $expGetLines = implode('<br>', array_slice(explode('<br>', $getExperience), 0, $otherPageLinesLimit - ($summary_lines + 4)));
-                        $remainExpLines = implode('<br>', array_slice(explode('<br>', $getExperience), $otherPageLinesLimit - ($summary_lines + 4)));
+                        $expGetLines = implode('<br>', array_slice(explode('<br>', $getExperience), 0, $otherPageLinesLimit - ($summary_lines)));
+                        $remainExpLines = implode('<br>', array_slice(explode('<br>', $getExperience), $otherPageLinesLimit - ($summary_lines)));
                         $htmlLaterPages[$pages] = objectiveTagReplace2($remainSumLines, $htmlLaterPages[$pages]);
-                        $htmlLaterPages[$pages] = experienceTagReplace2($expGetLines, $htmlLaterPages[$pages]);
+                        $htmlLaterPages[$pages] = experienceTagReplace($expGetLines, $htmlLaterPages[$pages]);
                         $total_lines = $total_lines - $summary_lines - count(explode('<br>', $expGetLines));
+                        $experience_lines = $experience_lines - count(explode('<br>', $expGetLines));
                         $experienceContinue_FLAG = true;
+                        $summaryContinue_FLAG = false;
                         $summary_lines = 0;
                     }
                 } elseif ($summary_lines > 53) {
@@ -318,18 +324,31 @@ for ($file = 1; $file < 11; $file++) {
                     $total_lines = $total_lines - 53;
                     $summary_lines = $summary_lines - 53;
                 } elseif ($experienceContinue_FLAG) {
+
                     $expGetLines = implode('<br>', array_slice(explode('<br>', $remainExpLines), 0, $otherPageLinesLimit));
                     $remainExpLines = implode('<br>', array_slice(explode('<br>', $remainExpLines), $otherPageLinesLimit));
                     $htmlLaterPages[$pages] = experienceTagReplace2($expGetLines, $htmlLaterPages[$pages]);
                     $experienceContinue_FLAG = true;
-                    $total_lines = $total_lines - 53;
+                    $summaryContinue_FLAG = false;
+                    $total_lines = $total_lines - $otherPageLinesLimit;
                     $lastLine_FLAG = true;
-
+                }
+                elseif($expStart_FLAG) {
+                    $expGetLines = implode('<br>', array_slice(explode('<br>', $getExperience), 0, $otherPageLinesLimit));
+                    $remainExpLines = implode('<br>', array_slice(explode('<br>', $getExperience), $otherPageLinesLimit));
+                    $htmlLaterPages[$pages] = experienceTagReplace($expGetLines, $htmlLaterPages[$pages]);
+                    $experienceContinue_FLAG = true;
+                    $summaryContinue_FLAG = false;
+                    $total_lines = $total_lines - $otherPageLinesLimit;
+                    if($total_lines<=$otherPageLinesLimit){
+                        $lastLine_FLAG = true;
+                    }
+                    else{}
+                    $expStart_FLAG=false;
                 }
             }
             $pages++;
         }
-
         $stylesheet = file_get_contents('lib/bootstrap.min.css');
         $stylesheet2 = file_get_contents('lib/main.css');
         $mpdfConfig = array(
@@ -342,9 +361,6 @@ for ($file = 1; $file < 11; $file++) {
             'margin_footer' => 0,
             'orientation' => 'P'
         );
-
-        $getSummary = '';
-        $getExperience = '';
 
         try {
             $mpdf = new Mpdf($mpdfConfig);
@@ -368,15 +384,44 @@ for ($file = 1; $file < 11; $file++) {
         } catch (MpdfException $e) {
         }
         try {
+            $csvSummary = str_replace('<br>','',$getSummary);
             $resumeName = explode(' ', $sections[0]['hugeheading']);
             shell_exec('rm -rf tmp' . $file);
-            $mpdf->Output('output/' . $resumeName[0] . '_' . $resumeName[1] . '-Accountant_Manager-New_Jersey_ ' . $file . ' .pdf', \Mpdf\Output\Destination::FILE);
-            shell_exec('chmod 777 -R output');
+            if(($csvDataArray[$file][$emailIndex] != "NA" && $csvDataArray[$file][$emailIndex] != "N/A") ||
+                ($csvDataArray[$file][$phoneNumberIndex] != "NA" && $csvDataArray[$file][$phoneNumberIndex] != "N/A"))
+            {
+                if($getSummary==""){
+                    fputcsv($addCsvData,[md5($csvDataArray[$file][$emailIndex].$csvDataArray[$file][$phoneNumberIndex]),
+                        $sections[0]['hugeheading'],
+                        $sections[2]['subheading'],
+                        $sections[2]['subheading'],
+                        $resumeName[0] . '_' . $resumeName[1] . '-Accountant_Manager-New_Jersey_ ' . $file .  '.pdf'],',');
+                }
+                else {
+                    fputcsv($addCsvData,[md5($csvDataArray[$file][$emailIndex].$csvDataArray[$file][$phoneNumberIndex]),
+                        $sections[0]['hugeheading'],
+                        $sections[2]['subheading'],
+                        $csvSummary,
+                        $resumeName[0] . '_' . $resumeName[1] . '-Accountant_Manager-New_Jersey_ ' . $file .  '.pdf'],',');
+                }
+                $mpdf->Output('output/' . $resumeName[0] . '_' . $resumeName[1] . '-Accountant_Manager-New_Jersey- ' . $file . ' .pdf', \Mpdf\Output\Destination::FILE);
+
+                shell_exec('chmod 777 -R output');
+            }
+            else {}
         } catch (MpdfException $e) {
         }
     } catch (Throwable $e) {
-        echo $file . "->  " . $e->getMessage() . $e->getLine() . "\n";
+        $err = $file . "   ->  " . $e->getMessage() . " " . $e->getLine() . "\n";
+        fputcsv($file_put,[$err]);
     }
+    $getSummary = '';
+    $getExperience = '';
     $summary = null;
     $experience = null;
 }
+fclose($addCsvData);
+fclose($file_put);
+shell_exec('chmod 777 generatedCSV.csv');
+shell_exec('chmod 777 error_logs');
+

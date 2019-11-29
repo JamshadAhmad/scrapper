@@ -144,34 +144,22 @@ function returnEducation($data)
     return $edu;
 }
 
-/**PERFORMING ALL OPERATIONS TO GET AND SET DATA
- *
- *
- * @param $replace
- * replace is a string which whill contain the html structure
- * @return mixed
- */
 
-//function performOperations($s1,$s2,$s3,$l1,$l2,$l3,$name,$subname,$objective,$experience,$replace){
-//    $d=[];
-//    $d2=[];
-//    $d[0] = $s1;
-//    $d[1] = $s2;
-//    $d[2] = $s3;
-//    $d2[0] = $l1;
-//    $d2[1] = $l2;
-//    $d2[2] = $l3;
-//
-//    $htmlFirstPage = nameTagReplace($name,$replace);
-//    $htmlFirstPage = subNameTagReplace($subname ,$replace);
-//    $htmlFirstPage = objectiveTagReplace($objective,$replace);
-//    $htmlFirstPage = experienceTagReplace($experience,$replace);
-//    $htmlFirstPage = educationTagReplace($getEducation,$replace);
-//    $htmlFirstPage = emailTagReplace($the_big_array[$file][$emailIndex],$replace);
-//    $htmlFirstPage = phoneTagReplace($the_big_array[$file][$phoneNumberIndex],$replace);
-//    $htmlFirstPage = addressTagReplace($sections[1]['subheading'],$replace);
-//    $htmlFirstPage = skillTagReplace($d,$replace);
-//    $htmlFirstPage = languageTagReplace($d2,$replace);
-//
-//    return $replace;
-//}
+/**
+ * CUSTOMIZE ERROR HANDLER
+ *
+ * @param $errno
+ * @param $errstr
+ * @param $errfile
+ * @param $errline
+ * @param $errcontext
+ * @return bool
+ * @throws ErrorException
+ */
+function myErrorHandler ($errno, $errstr, $errfile, $errline, $errcontext){
+    if (0 === error_reporting()) {
+        return false;
+    }
+
+    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+}
