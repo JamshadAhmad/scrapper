@@ -22,7 +22,7 @@ error_reporting(E_ALL);
 /**
  * INITIALIZATION
  */
-$csvFileNameWithPath = "lib/csvSC.csv";
+$csvFileNameWithPath = "lib/Account_Manager-New_Jersey.csv";
 $csvStringLengthMax = 10000;
 $pdfNameHeading = "PDF Name";
 $linkNameHeading = "Links";
@@ -102,7 +102,7 @@ $addCsvData = fopen('generatedCSV.csv','w');
 $file_put = fopen('error_logs','w');
 fputcsv($addCsvData,["Unique_Id","Name","JobTitle","Summary","CV"],",");
 $file_count = count($csvDataArray);
-for ($file = 1; $file < 1050; $file++) {
+for ($file = 1; $file < 2; $file++) {
     try {
         shell_exec('lib/pdftohtml input/' . $csvDataArray[$file][$pdfNameIndex] . '.pdf tmp' . $file);
         shell_exec('chmod 777 -R tmp' . $file);
@@ -386,6 +386,7 @@ for ($file = 1; $file < 1050; $file++) {
         try {
             $csvSummary = str_replace('<br>','',$getSummary);
             $resumeName = explode(' ', $sections[0]['hugeheading']);
+            $fileName = $resumeName[0] . '_' . $resumeName[1] . '-Accountant_Manager-New_Jersey-' . $file .  '.pdf';
             shell_exec('rm -rf tmp' . $file);
             if(($csvDataArray[$file][$emailIndex] != "NA" && $csvDataArray[$file][$emailIndex] != "N/A") ||
                 ($csvDataArray[$file][$phoneNumberIndex] != "NA" && $csvDataArray[$file][$phoneNumberIndex] != "N/A"))
@@ -395,16 +396,16 @@ for ($file = 1; $file < 1050; $file++) {
                         $sections[0]['hugeheading'],
                         $sections[2]['subheading'],
                         $sections[2]['subheading'],
-                        $resumeName[0] . '_' . $resumeName[1] . '-Accountant_Manager-New_Jersey_ ' . $file .  '.pdf'],',');
+                        $fileName],',');
                 }
                 else {
                     fputcsv($addCsvData,[md5($csvDataArray[$file][$emailIndex].$csvDataArray[$file][$phoneNumberIndex]),
                         $sections[0]['hugeheading'],
                         $sections[2]['subheading'],
                         $csvSummary,
-                        $resumeName[0] . '_' . $resumeName[1] . '-Accountant_Manager-New_Jersey_ ' . $file .  '.pdf'],',');
+                        $fileName],',');
                 }
-                $mpdf->Output('output/' . $resumeName[0] . '_' . $resumeName[1] . '-Accountant_Manager-New_Jersey- ' . $file . ' .pdf', \Mpdf\Output\Destination::FILE);
+                $mpdf->Output('output/' . $fileName, \Mpdf\Output\Destination::FILE);
 
                 shell_exec('chmod 777 -R output');
             }
@@ -414,6 +415,7 @@ for ($file = 1; $file < 1050; $file++) {
     } catch (Throwable $e) {
         $err = $file . "   ->  " . $e->getMessage() . " " . $e->getLine() . "\n";
         fputcsv($file_put,[$err]);
+        shell_exec('rm -rf tmp' . $file);
     }
     $getSummary = '';
     $getExperience = '';
